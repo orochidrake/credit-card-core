@@ -5,7 +5,9 @@
 
 
 ## Features
-
+- User Registration: Users can create an account.
+- User Login: Users can log in to their accounts.
+- Role-based Authentication: Three roles with different permission levels - regular user, user manager, admin.
 ## Get Started
 
 #### Clone the repository.

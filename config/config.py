@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic.v1 import BaseSettings
 from dotenv import load_dotenv
 from functools import lru_cache
 

@@ -8,3 +8,31 @@ class Role(str,Enum):
     USER = "user"
     MANAGER = "manager"
     ADMIN = "admin"
+
+@dataclass
+class SignUser:
+    fullname: str
+    email: str
+    role: Role
+
+
+class NewUser(BaseModel):
+    fullname: str
+    email: str
+    password: str
+    role:Role
+
+    class Config:
+        orm_mode = True
+
+class ResUser(BaseModel):
+    id: int
+    fullname: str
+    email: str
+    role: Role
+    date: str
+    time: str
+ 
+
+    class Config:
+        orm_mode = True

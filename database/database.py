@@ -5,15 +5,16 @@ from sqlalchemy.orm import sessionmaker
 SQLITE_DATA_BASE_URL = "sqlite:///./database.db"
 
 engine = create_engine(
-  SQLITE_DATA_BASE_URL, echo=True, connect_args={"check_same_thread": False}
+    SQLITE_DATA_BASE_URL, echo=True, connect_args={"check_same_thread": False}
 )
 
-Sessionlocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+
 def get_db():
-  db = Sessionlocal()
+  db = SessionLocal()
   try:
     yield db
   finally:
