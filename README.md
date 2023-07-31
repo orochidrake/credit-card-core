@@ -8,6 +8,13 @@
 - User Registration: Users can create an account.
 - User Login: Users can log in to their accounts.
 - Role-based Authentication: Three roles with different permission levels - regular user, user manager, admin.
+- User Manager: User managers can CRUD users.
+- Admin: Admins can CRUD all records and users.
+- JSON API: Data is returned in JSON format.
+- Filtering and Pagination: Endpoints provide filter capabilities and support pagination.
+- Unit and E2E Tests: Includes unit tests and end-to-end tests.
+- Python Web Framework: Uses any Python web framework.
+- SQLite Database: Uses SQLite as the database.
 ## Get Started
 
 #### Clone the repository.

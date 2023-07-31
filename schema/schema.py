@@ -22,8 +22,8 @@ class NewUser(BaseModel):
     password: str
     role:Role
 
-    class Config:
-        orm_mode = True
+    class ConfigDict:
+        from_attributes = True
 
 class ResUser(BaseModel):
     id: int
@@ -34,5 +34,12 @@ class ResUser(BaseModel):
     time: str
  
 
-    class Config:
-        orm_mode = True
+    class ConfigDict:
+        from_attributes = True
+
+class Login(BaseModel):
+    email: str
+    password: str
+
+    class ConfigDict:
+        from_attributes = True

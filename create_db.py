@@ -3,4 +3,4 @@ from models.user import User
 
 print("Creating database ....")
 
-Base.metadata.create_all(engine);
+Base.metadata.create_all(engine)

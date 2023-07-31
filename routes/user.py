@@ -2,10 +2,13 @@ from fastapi import status, HTTPException, APIRouter, Depends, Query
 from fastapi.security import OAuth2PasswordBearer
 from database.database import SessionLocal
 from models.user import User
-from schema.schema import NewUser,ResUser, Role
+from schema.schema import NewUser,ResUser, Role, Login
 from datetime import datetime
+from typing import List
+from auth.auth import sign_jwt
+from auth.auth import decode_jwt
 from sqlalchemy.exc import SQLAlchemyError
-from utils.helpers import hash_password
+from utils.helpers import hash_password,verify_hashed_password
 
 # Create a database session
 db = SessionLocal()
@@ -48,7 +51,62 @@ async def create_a_user(user: NewUser):
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="An error occurred while creating the user")
 
+# Endpoint for user login
+@router.post('/api/v1/login/')
+async def login_a_user(login: Login):
+    try:
+        db_user = db.query(User).filter(User.email == login.email).first()
 
+        if db_user is not None:
+            # Verify the user's password
+            is_password_valid = await verify_hashed_password(login.password, db_user.password)
+
+            if not is_password_valid:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You have entered a wrong password")
+            
+            if is_password_valid:
+                # Generate a JWT access token for authentication
+                token = sign_jwt(db_user)
+                return token
+            else:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You have entered a wrong password")
+    except SQLAlchemyError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found in the database")
+
+# Utility function to get user from token
+async def get_user_from_token(token: str):
+    user_from_token = decode_jwt(token)
+    if not user_from_token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
+    return user_from_token
+
+
+
+# Endpoint for retrieving a list of users
+@router.get('/api/v1/users/', response_model=List[ResUser], status_code=200)
+async def get_users(
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=100),
+    token: str = Depends(oauth2_scheme)
+):
+    try:
+        user_from_token = await get_user_from_token(token)
+        role = Role(user_from_token['role'])
+        user_email = user_from_token['user_email']
+        offset = (page - 1) * per_page
+
+        if role == Role.ADMIN:
+            user_entries = db.query(User).offset(offset).limit(per_page).all()
+        elif role == Role.MANAGER:
+            user_entries = db.query(User).filter(User.role == Role.USER).offset(offset).limit(per_page).all()
+        elif role == Role.USER:
+            user_entries = db.query(User).filter(User.email == user_email).first()
+        else:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient privileges")
+
+        return user_entries
+    except SQLAlchemyError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Export the router
 user_routes = router
