@@ -19,6 +19,7 @@ class ResponseCreditCard(BaseModel):
     holder: str
     number: str
     cvv: int
+    brand: str
     created_at: datetime
 
     class ConfigDict:
@@ -30,6 +31,7 @@ class ResponseUpdateCreditCard(BaseModel):
     holder: str
     number: str
     cvv: int
+    brand: str
     created_at: datetime
     
 
@@ -38,4 +40,4 @@ class ResponseUpdateCreditCard(BaseModel):
 
 class DeletionCreditCardSuccess(BaseModel):
     status: str = "Success"
-    message: str = "User deleted successfully."
+    message: str = "Credit Card deleted successfully."

@@ -13,8 +13,8 @@ def authorization_headers():
 @pytest.fixture
 def sign_up_info():
     return {
-        "fullname": "Test Fulano",
-        "email": "fulano@fulan.com",
+        "fullname": "Test3 Fulano2",
+        "email": "fulano3@fulan2.com",
         "password": "teste123",
         "role": "admin"
     }
@@ -22,8 +22,8 @@ def sign_up_info():
 @pytest.fixture
 def sample_update_payload():
     return {
-        "fullname": "Pro Admin",
-        "email": "admin@gmail.com",
+        "fullname": "Pro Admin3",
+        "email": "admin3@gmail.com",
         "password": "password updated",
         "role": "admin"
     }
