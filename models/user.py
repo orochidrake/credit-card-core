@@ -1,5 +1,6 @@
 
-from sqlalchemy import String,Boolean,Integer,Column,Text, Enum
+from sqlalchemy import String,Boolean,Integer,Column,Text, Enum, DateTime
+from sqlalchemy.sql import func
 from database.database import Base
 from schema.schema import Role
 
@@ -9,6 +10,5 @@ class User(Base):
     fullname=Column(String(255),nullable=False)
     email=Column(Text,nullable=False,unique=True)
     password=Column(String(255),nullable=False)
-    date=Column(String(255),nullable=False)
-    time=Column(String(244),nullable=False)
+    created_at=Column(DateTime(timezone=True))
     role=Column(Enum(Role))

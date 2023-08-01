@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 from typing import Optional
 from enum import Enum
 from dataclasses import dataclass
@@ -25,14 +26,12 @@ class NewUser(BaseModel):
     class ConfigDict:
         from_attributes = True
 
-class ResUser(BaseModel):
+class ResponseUser(BaseModel):
     id: int
     fullname: str
     email: str
     role: Role
-    date: str
-    time: str
- 
+    created_at: datetime
 
     class ConfigDict:
         from_attributes = True
@@ -43,3 +42,19 @@ class Login(BaseModel):
 
     class ConfigDict:
         from_attributes = True
+
+class ResponseUpdateUser(BaseModel):
+    id: int
+    fullname: str
+    email: str
+    password: str
+    role: Role
+    created_at: datetime
+    
+
+    class ConfigDict:
+        orm_mode = True
+
+class DeletionSuccess(BaseModel):
+    status: str = "Success"
+    message: str = "User deleted successfully."

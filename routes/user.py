@@ -2,7 +2,7 @@ from fastapi import status, HTTPException, APIRouter, Depends, Query
 from fastapi.security import OAuth2PasswordBearer
 from database.database import SessionLocal
 from models.user import User
-from schema.schema import NewUser,ResUser, Role, Login
+from schema.schema import NewUser,ResponseUser, Role, Login
 from datetime import datetime
 from typing import List
 from auth.auth import sign_jwt
@@ -21,7 +21,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
 
 
 # Endpoint for creating a new user
-@router.post('/api/v1/signup/', response_model=ResUser, status_code=status.HTTP_201_CREATED)
+@router.post('/api/v1/signup/', response_model=ResponseUser, status_code=status.HTTP_201_CREATED)
 async def create_a_user(user: NewUser):
     try:
         # Hash the user's password
@@ -33,8 +33,7 @@ async def create_a_user(user: NewUser):
             email=user.email,
             password=hashed_password,
             role=user.role,
-            date=datetime.now().strftime("%Y-%m-%d"),
-            time=datetime.now().strftime("%H:%M:%S"),
+            created_at=datetime.now(),
         )
 
         # Check if a user with the same email already exists
@@ -83,7 +82,7 @@ async def get_user_from_token(token: str):
 
 
 # Endpoint for retrieving a list of users
-@router.get('/api/v1/users/', response_model=List[ResUser], status_code=200)
+@router.get('/api/v1/users/', response_model=List[ResponseUser], status_code=200)
 async def get_users(
     page: int = Query(1, ge=1),
     per_page: int = Query(10, ge=1, le=100),
@@ -103,7 +102,7 @@ async def get_users(
             user_entries = db.query(User).filter(User.email == user_email).first()
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient privileges")
-
+        print(user_entries)
         return user_entries
     except SQLAlchemyError:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

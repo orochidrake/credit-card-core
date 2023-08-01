@@ -40,4 +40,4 @@ def test_get_users(authorization_headers):
 
     for element in response.json():
         assert isinstance(element, dict)
-        assert all(key in element for key in ["id", "fullname", "email", "role", "date", "time"])
+        assert all(key in element for key in ["id", "fullname", "email", "role", "created_at"])
