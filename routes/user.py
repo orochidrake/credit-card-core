@@ -2,7 +2,7 @@ from fastapi import status, HTTPException, APIRouter, Depends, Query
 from fastapi.security import OAuth2PasswordBearer
 from database.database import SessionLocal
 from models.user import User
-from schema.schema import NewUser,ResponseUser, Role, Login, ResponseUpdateUser, DeletionSuccess
+from schema.user_schema import NewUser,ResponseUser, Role, Login, ResponseUpdateUser, DeletionSuccess
 from datetime import datetime
 from typing import List
 from auth.auth import sign_jwt

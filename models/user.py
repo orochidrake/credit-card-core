@@ -1,8 +1,7 @@
 
-from sqlalchemy import String,Boolean,Integer,Column,Text, Enum, DateTime
-from sqlalchemy.sql import func
+from sqlalchemy import String,Integer,Column,Text, Enum, DateTime
 from database.database import Base
-from schema.schema import Role
+from schema.user_schema import Role
 
 class User(Base):
     __tablename__='users'

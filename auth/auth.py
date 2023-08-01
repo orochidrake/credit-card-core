@@ -1,7 +1,7 @@
 import time
 import jwt
 from config.config import settings
-from schema.schema import SignUser
+from schema.user_schema import SignUser
 
 JWT_SECRET = settings.JWT_SECRET
 JWT_ALGORITHM = settings.JWT_ALGORITHM
