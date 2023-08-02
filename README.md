@@ -8,8 +8,8 @@
 - User Registration: Users can create an account.
 - User Login: Users can log in to their accounts.
 - Role-based Authentication: Three roles with different permission levels - regular user, user manager, admin.
-- User Manager: User managers can CRUD users.
-- Admin: Admins can CRUD all records and users.
+- User and Manager: User and managers can CRUD users and Register Credit Cards.
+- Admin: Admins can CRUD all records and users, register, list, get, Delete Credit Cards.
 - JSON API: Data is returned in JSON format.
 - Filtering and Pagination: Endpoints provide filter capabilities and support pagination.
 - Unit and E2E Tests: Includes unit tests and end-to-end tests.
@@ -42,3 +42,8 @@ Application will be exposed to port 8000 on http://localhost:8000/
 ```shell
     python main.py
 ```
+
+#### Documentation Methods.
+
+The Documentation for all methods http://localhost:8000/docs
+[here] (http://localhost:8000/docs)
