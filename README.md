@@ -45,5 +45,4 @@ Application will be exposed to port 8000 on http://localhost:8000/
 
 #### Documentation Methods.
 
-The Documentation for all methods http://localhost:8000/docs
-[here] (http://localhost:8000/docs)
+The Documentation for all methods http://localhost:8000/docs [here](http://localhost:8000/docs)
