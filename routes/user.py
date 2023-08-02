@@ -125,8 +125,7 @@ async def update_user_details(
                 user_entry_to_update.fullname = new_entry.fullname
                 user_entry_to_update.email = new_entry.email
                 user_entry_to_update.password = hashed_password
-                user_entry_to_update.date = datetime.now().strftime("%Y-%m-%d")
-                user_entry_to_update.time = datetime.now().strftime("%H:%M:%S")
+                user_entry_to_update.created_at = datetime.now()
                 user_entry_to_update.role = new_entry.role
 
                 db.commit()
