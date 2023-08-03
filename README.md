@@ -37,6 +37,7 @@ I used NextJS as a frontend framework because it is robust, scalable
 #### Run Postgres Docker Container for DataBase
 
 ```shell
+    mv .env.example .env
     docker-compose up --build -d
 ```
 
@@ -106,3 +107,4 @@ curl --request GET \
 #### For Documentation
 
 The Documentation for all methods [here](http://localhost:8000/docs)
+http://localhost:8000/docs
