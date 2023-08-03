@@ -10,7 +10,8 @@ expiration_time = time.time() + (16 * 60 * 60)  # 16 hours (60 minutes * 60 seco
 
 def sign_jwt(user: SignUser):
     payload = {
-        "user_id":user.fullname,
+        "user_id":user.id,
+        "user_name":user.fullname,
         "user_email": user.email,
         "role":user.role,
         "expires": expiration_time

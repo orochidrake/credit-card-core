@@ -11,6 +11,7 @@ class Role(str,Enum):
 
 @dataclass
 class SignUser:
+    id: int
     fullname: str
     email: str
     role: Role

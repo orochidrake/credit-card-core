@@ -42,6 +42,18 @@ Application will be exposed to port 8000 on http://localhost:8000/
 ```shell
     python main.py
 ```
+Use the culr to create a Admin User
+```
+curl --request POST \
+  --url http://localhost:8000/api/v1/signup/ \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"fullname": "Fulano",
+	"email": "fulano@gmail.com",
+	"password": "fulanopass",
+	"role": "admin"
+}'
+```
 
 #### Documentation Methods.
 

@@ -17,7 +17,7 @@ router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
 
 
-# Create User Method
+# Signup User Method
 @router.post('/api/v1/signup/', response_model=ResponseUser, status_code=status.HTTP_201_CREATED)
 async def create_a_user(user: NewUser):
     try:
@@ -43,6 +43,7 @@ async def create_a_user(user: NewUser):
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="An error occurred while creating the user")
 
+
 # User Login Method
 @router.post('/api/v1/login/')
 async def login_a_user(login: Login):
@@ -66,10 +67,12 @@ async def login_a_user(login: Login):
 # Get user from token
 async def get_user_from_token(token: str):
     user_from_token = decode_jwt(token)
+    
     if not user_from_token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
     return user_from_token
 
+    
 # List All Users Method
 @router.get('/api/v1/users/', response_model=List[ResponseUser], status_code=200)
 async def get_users(
@@ -96,8 +99,83 @@ async def get_users(
     except SQLAlchemyError:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+# Get Users by TOKEN Method
+@router.get('/api/v1/user', response_model=ResponseUser, status_code=200)
+async def get_users(
+    token: str = Depends(oauth2_scheme)
+):
+    try:
+        user_from_token = await get_user_from_token(token)
+        role = Role(user_from_token['role'])
+        user_id = user_from_token['user_id']
+        if role == Role.ADMIN:
+            user = db.query(User).filter(User.id == user_id).first()
+        elif role == Role.USER:
+            user = db.query(User).filter(User.id == user_id).first()
+        else:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient privileges")
+        
+        return user
+    except SQLAlchemyError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+# Get Users by id Method
+@router.get('/api/v1/user/{user_id}', response_model=ResponseUser, status_code=200)
+async def get_users(
+    user_id: int,
+    token: str = Depends(oauth2_scheme)
+):
+    try:
+        user_from_token = await get_user_from_token(token)
+        role = Role(user_from_token['role'])
+        
+        if role == Role.ADMIN:
+            user = db.query(User).filter(User.id == user_id).first()
+        elif role == Role.USER:
+            user = db.query(User).filter(User.id == user_id).first()
+        else:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient privileges")
+        
+        return user
+    except SQLAlchemyError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Create User Method
+@router.post('/api/v1/create-user/', response_model=ResponseUser, status_code=status.HTTP_201_CREATED)
+async def create_a_user(user: NewUser, token: str = Depends(oauth2_scheme)):
+    try:
+        hashed_password = await hash_password(user.password)
+        user_from_token = await get_user_from_token(token)
+        role = Role(user_from_token['role'])
+
+        new_user = User(
+            fullname=user.fullname,
+            email=user.email,
+            password=hashed_password,
+            role=user.role,
+            created_at=datetime.now(),
+        )
+
+        db_item = db.query(User).filter(User.email == new_user.email).first()
+
+        if db_item is not None:
+            raise HTTPException(status_code=409, detail="User with the email already exists")
+        
+        if role == Role.ADMIN:
+            db.add(new_user)
+            db.commit()
+        
+        else:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient privileges")
+        
+
+        return new_user
+    except SQLAlchemyError:
+        raise HTTPException(status_code=500, detail="An error occurred while creating the user")
+
 #Update Method
-@router.put('/users/{user_id}/', response_model=ResponseUpdateUser, status_code=200)
+@router.put('/api/v1/user/{user_id}', response_model=ResponseUpdateUser, status_code=200)
 async def update_user_details(
     user_id: int,
     new_entry: NewUser,
@@ -106,32 +184,18 @@ async def update_user_details(
     try:
         user_from_token = await get_user_from_token(token)
         role = Role(user_from_token['role'])
-        user_email = user_from_token['user_email']
-
         user_entry_to_update = db.query(User).filter(User.id == user_id).first()
 
         if user_entry_to_update is None:
             raise HTTPException(status_code=400, detail=f"User with the id {user_id} was not found")
 
-        if (
-            role == Role.ADMIN
-            or (role == Role.MANAGER and user_entry_to_update.role == Role.USER)
-            or (role == Role.USER and user_entry_to_update.email == user_email)
-        ):
-            is_email_in_db = db.query(User).filter(User.email == new_entry.email).first()
-            if is_email_in_db and is_email_in_db.email == new_entry.email:
-                hashed_password = await hash_password(new_entry.password)
-                
-                user_entry_to_update.fullname = new_entry.fullname
-                user_entry_to_update.email = new_entry.email
-                user_entry_to_update.password = hashed_password
-                user_entry_to_update.created_at = datetime.now()
-                user_entry_to_update.role = new_entry.role
+        if role == Role.ADMIN:
+            user_entry_to_update.fullname = new_entry.fullname
+            user_entry_to_update.email = new_entry.email
+            user_entry_to_update.created_at = datetime.now()
+            user_entry_to_update.role = new_entry.role
 
-                db.commit()
-            else:
-                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Email already registered by a different user")
-
+            db.commit()
 
         else:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient privileges")
@@ -144,7 +208,7 @@ async def update_user_details(
 
 
 # DELETE Method
-@router.delete('/api/v1/users/{user_id}/', response_model=DeletionSuccess, status_code=200)
+@router.delete('/api/v1/user/{user_id}', response_model=DeletionSuccess, status_code=200)
 async def delete_user_detail(
     user_id: int,
     token: str = Depends(oauth2_scheme)

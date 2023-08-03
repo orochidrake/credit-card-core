@@ -21,10 +21,10 @@ async def verify_hashed_password(password:str,hashed_password: str):
         return False
     
 async def full_exp_date(item: str):
-  date_temp = item.split('/')
-  res = calendar.monthrange(int(date_temp[1]), int(date_temp[0]))
+  date_temp = item.split('-')
+  res = calendar.monthrange(int(date_temp[0]), int(date_temp[1]))
   day = res[1]
-  return date(int(date_temp[1]), int(date_temp[0]), int(day))
+  return date(int(date_temp[0]), int(date_temp[1]), int(day))
 
   
 async def encode_credit_card_number(number: str):
